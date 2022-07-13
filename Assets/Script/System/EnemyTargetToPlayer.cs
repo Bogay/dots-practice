@@ -22,16 +22,20 @@ namespace Bogay.VampireSurvivorLike.System
                 return;
             this.createMove(target);
             this.updateMove(target);
-            this.endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(this.Dependency);
+            this.Dependency.Complete();
         }
 
         // TODO: I am not sure whether this is the right way to find a player
         private bool tryFindTarget(ref LocalToWorld target)
         {
-            var player_ent = GetSingleton<Component.Player>().entity;
-            if (!HasComponent<LocalToWorld>(player_ent))
-                return false;
-            target = GetComponent<LocalToWorld>(player_ent);
+            var _target = new LocalToWorld();
+            Entities
+                .WithAll<Component.Player>()
+                .ForEach((in LocalToWorld localToWorld) =>
+                {
+                    _target = localToWorld;
+                }).Run();
+            target = _target;
             return true;
         }
 
